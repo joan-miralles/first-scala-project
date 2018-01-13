@@ -13,6 +13,12 @@ final class ScalaHttpApiTest extends WordSpec with Matchers with ScalaFutures wi
         complete(HttpEntity(ContentTypes.`application/json`, """{"status":"ok"}"""))
       }
     }
+  private val projectsRoute =
+    get {
+      path("projects") {
+        complete(HttpEntity(ContentTypes.`application/json`, """[{"id":1,"name":"Project A"},{"id":2,"name":"Project B"}]"""))
+      }
+    }
 
   "ScalaHttpApi" should {
     "respond ok when status is requested" in {
@@ -20,6 +26,14 @@ final class ScalaHttpApiTest extends WordSpec with Matchers with ScalaFutures wi
         status shouldBe StatusCodes.OK
         contentType shouldBe ContentTypes.`application/json`
         entityAs[String] shouldBe """{"status":"ok"}"""
+      }
+    }
+
+    "respond with a list of two projects when projects is requested" in {
+      Get("/projects") ~> projectsRoute ~> check {
+        status shouldBe StatusCodes.OK
+        contentType shouldBe ContentTypes.`application/json`
+        entityAs[String] shouldBe """[{"id":1,"name":"Project A"},{"id":2,"name":"Project B"}]"""
       }
     }
   }
